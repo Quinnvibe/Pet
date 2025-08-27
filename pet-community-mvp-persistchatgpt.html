@@ -1,0 +1,1876 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>宠友圈 - 养宠经验分享社区</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #FF6B6B;
+            --secondary: #4ECDC4;
+            --dark: #2C3E50;
+            --light: #F7F9FC;
+            --gray: #95A5A6;
+            --success: #2ECC71;
+            --warning: #F39C12;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: var(--light);
+            color: var(--dark);
+            min-height: 100vh;
+            padding-bottom: 60px;
+        }
+        
+        /* 顶部导航 */
+        .header {
+            background: white;
+            padding: 12px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .logo {
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .logo::before {
+            content: "🐾";
+            font-size: 24px;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .search-icon, .notification-icon {
+            font-size: 20px;
+            color: var(--gray);
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        
+        .search-icon:hover, .notification-icon:hover {
+            color: var(--primary);
+        }
+        
+        /* 分类标签 */
+        .category-tabs {
+            background: white;
+            padding: 10px 15px;
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .category-tabs::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .tab {
+            padding: 6px 16px;
+            background: var(--light);
+            border-radius: 20px;
+            font-size: 14px;
+            color: var(--gray);
+            cursor: pointer;
+            transition: all 0.3s;
+            flex-shrink: 0;
+        }
+        
+        .tab.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        /* 内容区域 */
+        .content {
+            padding: 15px;
+        }
+        
+        /* 发帖入口 */
+        .post-entry {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .post-entry:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        
+        .post-entry-text {
+            color: var(--gray);
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .post-entry-text::before {
+            content: "✏️";
+            font-size: 18px;
+        }
+        
+        /* 帖子卡片 */
+        .post-card {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            transition: transform 0.3s;
+        }
+        
+        .post-card:active {
+            transform: scale(0.98);
+        }
+        
+        .post-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        
+        .post-info {
+            flex: 1;
+        }
+        
+        .username {
+            font-weight: 600;
+            font-size: 15px;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .badge {
+            background: var(--warning);
+            color: white;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-weight: normal;
+        }
+        
+        .post-time {
+            font-size: 12px;
+            color: var(--gray);
+            margin-top: 2px;
+        }
+        
+        .post-content {
+            margin-bottom: 12px;
+        }
+        
+        .post-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--dark);
+        }
+        
+        .post-text {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #555;
+        }
+        
+        .post-images {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-top: 10px;
+        }
+        
+        .post-image {
+            width: 100%;
+            padding-bottom: 100%;
+            background: #f0f0f0;
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .post-image img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .post-tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin: 10px 0;
+        }
+        
+        .tag {
+            background: #E8F4F3;
+            color: var(--secondary);
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+        
+        .post-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 12px;
+            border-top: 1px solid #f0f0f0;
+        }
+        
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 14px;
+            color: var(--gray);
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        
+        .action-btn:hover {
+            color: var(--primary);
+        }
+        
+        .action-btn.liked {
+            color: var(--primary);
+        }
+        
+        /* 底部导航 */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+            z-index: 100;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 20px;
+            cursor: pointer;
+            transition: color 0.3s;
+            color: var(--gray);
+            position: relative;
+        }
+        
+        .nav-item .badge-dot {
+            position: absolute;
+            top: 2px;
+            right: 18px;
+            width: 8px;
+            height: 8px;
+            background: var(--primary);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        .nav-item.active {
+            color: var(--primary);
+        }
+        
+        .nav-icon {
+            font-size: 20px;
+        }
+        
+        .nav-text {
+            font-size: 11px;
+        }
+        
+        /* 浮动发帖按钮 */
+        .fab {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            box-shadow: 0 4px 20px rgba(255, 107, 107, 0.4);
+            cursor: pointer;
+            z-index: 99;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .fab:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 30px rgba(255, 107, 107, 0.6);
+        }
+        
+        .fab:active {
+            transform: scale(0.95);
+        }
+        
+        /* 弹出层 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 200;
+            animation: fadeIn 0.3s;
+        }
+        
+        .modal.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+        
+        .modal-content {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-radius: 20px 20px 0 0;
+            padding: 20px;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .modal-title {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        .close-btn {
+            font-size: 24px;
+            color: var(--gray);
+            cursor: pointer;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 14px;
+            color: var(--dark);
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .form-input, .form-textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-input:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        .category-select {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+        
+        .category-option {
+            padding: 10px;
+            text-align: center;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+        
+        .category-option.selected {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        
+        .submit-btn:active {
+            transform: scale(0.98);
+        }
+        
+        /* 专家标识 */
+        .expert-badge {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            color: white;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+        
+        /* 加载动画 */
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: var(--gray);
+        }
+        
+        .loading::after {
+            content: "...";
+            animation: dots 1.5s infinite;
+        }
+        
+        @keyframes dots {
+            0%, 20% { content: "."; }
+            40% { content: ".."; }
+            60%, 100% { content: "..."; }
+        }
+        
+        /* 群聊样式 */
+        .chat-container {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #F7F9FC;
+            z-index: 300;
+            flex-direction: column;
+        }
+        
+        .chat-container.active {
+            display: flex;
+        }
+        
+        .chat-header {
+            background: white;
+            padding: 12px 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .chat-back {
+            font-size: 20px;
+            cursor: pointer;
+            padding: 5px;
+        }
+        
+        .chat-title {
+            flex: 1;
+            text-align: center;
+            font-weight: 600;
+            font-size: 16px;
+        }
+        
+        .chat-info {
+            font-size: 20px;
+            cursor: pointer;
+            padding: 5px;
+        }
+        
+        .chat-groups {
+            background: white;
+            padding: 10px 15px;
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .chat-groups::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .group-tab {
+            padding: 8px 16px;
+            background: var(--light);
+            border-radius: 20px;
+            font-size: 14px;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.3s;
+            flex-shrink: 0;
+            position: relative;
+        }
+        
+        .group-tab.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .group-tab .member-count {
+            font-size: 11px;
+            opacity: 0.8;
+            margin-left: 4px;
+        }
+        
+        .group-tab .unread {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background: red;
+            color: white;
+            font-size: 10px;
+            padding: 2px 5px;
+            border-radius: 10px;
+            min-width: 16px;
+            text-align: center;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .message {
+            display: flex;
+            gap: 10px;
+            animation: messageSlide 0.3s;
+        }
+        
+        @keyframes messageSlide {
+            from { 
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .message.own {
+            flex-direction: row-reverse;
+        }
+        
+        .message-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+        
+        .message-content {
+            max-width: 70%;
+        }
+        
+        .message-bubble {
+            background: white;
+            padding: 10px 14px;
+            border-radius: 12px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            position: relative;
+        }
+        
+        .message.own .message-bubble {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .message-text {
+            font-size: 14px;
+            line-height: 1.5;
+            word-wrap: break-word;
+        }
+        
+        .message-time {
+            font-size: 11px;
+            color: var(--gray);
+            margin-top: 4px;
+        }
+        
+        .message.own .message-time {
+            color: rgba(255,255,255,0.8);
+            text-align: right;
+        }
+        
+        .message-name {
+            font-size: 12px;
+            color: var(--gray);
+            margin-bottom: 4px;
+            font-weight: 500;
+        }
+        
+        .system-message {
+            text-align: center;
+            font-size: 12px;
+            color: var(--gray);
+            padding: 8px;
+            background: rgba(0,0,0,0.05);
+            border-radius: 20px;
+            margin: 10px auto;
+        }
+        
+        .chat-input-container {
+            background: white;
+            padding: 10px 15px;
+            border-top: 1px solid #eee;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .chat-input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 25px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        
+        .chat-input:focus {
+            border-color: var(--primary);
+        }
+        
+        .chat-send {
+            width: 36px;
+            height: 36px;
+            background: var(--primary);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s;
+        }
+        
+        .chat-send:active {
+            transform: scale(0.9);
+        }
+        
+        .chat-plus {
+            font-size: 24px;
+            color: var(--gray);
+            cursor: pointer;
+        }
+        
+        .typing-indicator {
+            display: flex;
+            gap: 4px;
+            padding: 10px 14px;
+            background: white;
+            border-radius: 12px;
+            width: fit-content;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--gray);
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+        
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes typing {
+            0%, 60%, 100% {
+                transform: translateY(0);
+                opacity: 0.5;
+            }
+            30% {
+                transform: translateY(-10px);
+                opacity: 1;
+            }
+        }
+        
+        .group-list-modal {
+            padding: 20px;
+        }
+        
+        .group-card {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        
+        .group-card:active {
+            transform: scale(0.98);
+        }
+        
+        .group-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        
+        .group-info {
+            flex: 1;
+            margin-left: 15px;
+        }
+        
+        .group-name {
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+        
+        .group-desc {
+            font-size: 12px;
+            color: var(--gray);
+        }
+        
+        .join-btn {
+            padding: 8px 20px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航 -->
+    <div class="header">
+        <div class="logo">宠友圈</div>
+        <div class="header-actions">
+            <span class="search-icon">🔍</span>
+            <span class="notification-icon">🔔</span>
+        </div>
+    </div>
+    
+    <!-- 分类标签 -->
+    <div class="category-tabs">
+        <div class="tab active" data-category="all">全部</div>
+        <div class="tab" data-category="dog">🐕 狗狗</div>
+        <div class="tab" data-category="cat">🐱 猫猫</div>
+        <div class="tab" data-category="health">💊 健康</div>
+        <div class="tab" data-category="food">🍖 饮食</div>
+        <div class="tab" data-category="behavior">🎾 行为</div>
+        <div class="tab" data-category="save">💰 省钱</div>
+    </div>
+    
+    <!-- 内容区域 -->
+    <div class="content">
+        <!-- 发帖入口 -->
+        <div class="post-entry" onclick="showPostModal()">
+            <div class="post-entry-text">分享你的养宠经验，帮助更多宠友...</div>
+        </div>
+        
+        <!-- 帖子列表 -->
+        <div id="postList">
+            <!-- 示例帖子1 -->
+            <div class="post-card">
+                <div class="post-header">
+                    <div class="avatar">王</div>
+                    <div class="post-info">
+                        <div class="username">
+                            王阿姨
+                            <span class="badge">资深铲屎官</span>
+                        </div>
+                        <div class="post-time">2小时前</div>
+                    </div>
+                </div>
+                <div class="post-content">
+                    <div class="post-title">老年犬关节保养，不用买贵的保健品！</div>
+                    <div class="post-text">我家金毛今年12岁了，之前关节一直不好，宠物医院推荐的保健品一个月要800多。后来群里的朋友推荐了一个配方：鱼油+氨糖+钙片，某宝上买一个月才100多，效果特别好...</div>
+                    <div class="post-tags">
+                        <span class="tag">#老年犬</span>
+                        <span class="tag">#省钱妙招</span>
+                        <span class="tag">#关节保养</span>
+                    </div>
+                </div>
+                <div class="post-actions">
+                    <span class="action-btn liked">❤️ 256</span>
+                    <span class="action-btn">💬 45</span>
+                    <span class="action-btn">📤 分享</span>
+                    <span class="action-btn">⭐ 收藏</span>
+                </div>
+            </div>
+            
+            <!-- 示例帖子2 -->
+            <div class="post-card">
+                <div class="post-header">
+                    <div class="avatar" style="background: linear-gradient(135deg, #667eea, #764ba2);">李</div>
+                    <div class="post-info">
+                        <div class="username">
+                            李医生
+                            <span class="expert-badge">认证兽医</span>
+                        </div>
+                        <div class="post-time">5小时前</div>
+                    </div>
+                </div>
+                <div class="post-content">
+                    <div class="post-title">猫咪软便不一定要去医院，试试这个方法</div>
+                    <div class="post-text">最近很多朋友问猫咪软便怎么办。其实大部分情况是肠胃敏感导致的，可以先试试：1.禁食12小时 2.喂益生菌（推荐布拉迪） 3.换成肠胃敏感粮。如果3天没改善再就医...</div>
+                    <div class="post-images">
+                        <div class="post-image">
+                            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect fill='%23f0f0f0' width='100' height='100'/%3E%3Ctext x='50' y='50' text-anchor='middle' dy='.3em' fill='%23999' font-size='16'%3E图片1%3C/text%3E%3C/svg%3E" alt="示例图片">
+                        </div>
+                        <div class="post-image">
+                            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect fill='%23f0f0f0' width='100' height='100'/%3E%3Ctext x='50' y='50' text-anchor='middle' dy='.3em' fill='%23999' font-size='16'%3E图片2%3C/text%3E%3C/svg%3E" alt="示例图片">
+                        </div>
+                    </div>
+                    <div class="post-tags">
+                        <span class="tag">#猫咪健康</span>
+                        <span class="tag">#专业建议</span>
+                    </div>
+                </div>
+                <div class="post-actions">
+                    <span class="action-btn">❤️ 892</span>
+                    <span class="action-btn">💬 127</span>
+                    <span class="action-btn">📤 分享</span>
+                    <span class="action-btn">⭐ 收藏</span>
+                </div>
+            </div>
+            
+            <!-- 示例帖子3 -->
+            <div class="post-card">
+                <div class="post-header">
+                    <div class="avatar" style="background: linear-gradient(135deg, #f093fb, #f5576c);">小</div>
+                    <div class="post-info">
+                        <div class="username">小美妈妈</div>
+                        <div class="post-time">昨天</div>
+                    </div>
+                </div>
+                <div class="post-content">
+                    <div class="post-title">求助：柴犬掉毛严重怎么办？</div>
+                    <div class="post-text">我家柴犬最近掉毛特别厉害，每天梳都能梳下一大把，家里到处都是毛。已经换了好几种狗粮了，也吃了美毛粉，但是效果不明显。请问大家有什么好办法吗？</div>
+                    <div class="post-tags">
+                        <span class="tag">#求助</span>
+                        <span class="tag">#掉毛</span>
+                        <span class="tag">#柴犬</span>
+                    </div>
+                </div>
+                <div class="post-actions">
+                    <span class="action-btn">❤️ 23</span>
+                    <span class="action-btn">💬 67</span>
+                    <span class="action-btn">📤 分享</span>
+                    <span class="action-btn">⭐ 收藏</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="loading">加载更多内容</div>
+    </div>
+    
+    <!-- 底部导航 -->
+    <div class="bottom-nav">
+        <div class="nav-item active">
+            <span class="nav-icon">🏠</span>
+            <span class="nav-text">首页</span>
+        </div>
+        <div class="nav-item">
+            <span class="nav-icon">🔥</span>
+            <span class="nav-text">热门</span>
+        </div>
+        <div class="nav-item" onclick="openChatGroups()">
+            <span class="nav-icon">💬</span>
+            <span class="nav-text">群聊</span>
+            <span class="badge-dot"></span>
+        </div>
+        <div class="nav-item">
+            <span class="nav-icon">❓</span>
+            <span class="nav-text">问答</span>
+        </div>
+        <div class="nav-item">
+            <span class="nav-icon">👤</span>
+            <span class="nav-text">我的</span>
+        </div>
+    </div>
+    
+    <!-- 浮动发帖按钮 -->
+    <div class="fab" onclick="showPostModal()">+</div>
+    
+    <!-- 群聊界面 -->
+    <div id="chatContainer" class="chat-container">
+        <div class="chat-header">
+            <span class="chat-back" onclick="closeChat()">←</span>
+            <div class="chat-title">狗狗健康交流群</div>
+            <span class="chat-info">ℹ️</span>
+        </div>
+        
+        <div class="chat-groups">
+            <div class="group-tab active" data-group="dog-health">
+                🏥 狗狗健康
+                <span class="member-count">(234)</span>
+            </div>
+            <div class="group-tab" data-group="cat-daily">
+                😺 猫咪日常
+                <span class="member-count">(189)</span>
+                <span class="unread">3</span>
+            </div>
+            <div class="group-tab" data-group="save-money">
+                💰 省钱妙招
+                <span class="member-count">(456)</span>
+            </div>
+            <div class="group-tab" data-group="newbie">
+                🌱 新手村
+                <span class="member-count">(678)</span>
+            </div>
+            <div class="group-tab" data-group="senior">
+                👴 老年宠物
+                <span class="member-count">(123)</span>
+            </div>
+        </div>
+        
+        <div class="chat-messages" id="chatMessages">
+            <div class="system-message">欢迎来到狗狗健康交流群 👋</div>
+            
+            <div class="message">
+                <div class="message-avatar">王</div>
+                <div class="message-content">
+                    <div class="message-name">王阿姨</div>
+                    <div class="message-bubble">
+                        <div class="message-text">大家好！我家金毛最近掉毛特别厉害，有什么好办法吗？</div>
+                    </div>
+                    <div class="message-time">10:23</div>
+                </div>
+            </div>
+            
+            <div class="message">
+                <div class="message-avatar" style="background: linear-gradient(135deg, #667eea, #764ba2);">李</div>
+                <div class="message-content">
+                    <div class="message-name">李医生 <span class="expert-badge">认证兽医</span></div>
+                    <div class="message-bubble">
+                        <div class="message-text">春季是换毛期，建议：1.每天梳毛 2.补充鱼油 3.检查是否有皮肤问题</div>
+                    </div>
+                    <div class="message-time">10:25</div>
+                </div>
+            </div>
+            
+            <div class="message">
+                <div class="message-avatar" style="background: linear-gradient(135deg, #f093fb, #f5576c);">张</div>
+                <div class="message-content">
+                    <div class="message-name">张姐</div>
+                    <div class="message-bubble">
+                        <div class="message-text">我家的也是！每天梳毛能梳下一大把 😭</div>
+                    </div>
+                    <div class="message-time">10:26</div>
+                </div>
+            </div>
+            
+            <div class="system-message">小明加入了群聊</div>
+            
+            <div class="message">
+                <div class="message-avatar">明</div>
+                <div class="message-content">
+                    <div class="message-name">小明</div>
+                    <div class="message-bubble">
+                        <div class="message-text">新人报道！请问狗狗疫苗一般多久打一次？</div>
+                    </div>
+                    <div class="message-time">10:30</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="chat-input-container">
+            <span class="chat-plus">⊕</span>
+            <input type="text" class="chat-input" id="chatInput" placeholder="输入消息...">
+            <button class="chat-send" onclick="sendMessage()">➤</button>
+        </div>
+    </div>
+    
+    <!-- 群组列表弹窗 -->
+    <div id="groupListModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">加入群聊</h3>
+                <span class="close-btn" onclick="hideGroupListModal()">×</span>
+            </div>
+            
+            <div class="group-list-modal">
+                <div class="group-card" onclick="joinGroup('dog-health')">
+                    <div class="group-icon">🏥</div>
+                    <div class="group-info">
+                        <div class="group-name">狗狗健康交流群</div>
+                        <div class="group-desc">分享狗狗健康知识，有认证兽医在线答疑</div>
+                    </div>
+                    <button class="join-btn">加入</button>
+                </div>
+                
+                <div class="group-card" onclick="joinGroup('cat-daily')">
+                    <div class="group-icon">😺</div>
+                    <div class="group-info">
+                        <div class="group-name">猫咪日常分享</div>
+                        <div class="group-desc">猫奴聚集地，分享主子的可爱日常</div>
+                    </div>
+                    <button class="join-btn">加入</button>
+                </div>
+                
+                <div class="group-card" onclick="joinGroup('save-money')">
+                    <div class="group-icon">💰</div>
+                    <div class="group-info">
+                        <div class="group-name">省钱妙招群</div>
+                        <div class="group-desc">团购、优惠信息，养宠省钱秘籍</div>
+                    </div>
+                    <button class="join-btn">加入</button>
+                </div>
+                
+                <div class="group-card" onclick="joinGroup('newbie')">
+                    <div class="group-icon">🌱</div>
+                    <div class="group-info">
+                        <div class="group-name">新手村</div>
+                        <div class="group-desc">新手养宠交流，老司机带路</div>
+                    </div>
+                    <button class="join-btn">加入</button>
+                </div>
+                
+                <div class="group-card" onclick="joinGroup('senior')">
+                    <div class="group-icon">👴</div>
+                    <div class="group-info">
+                        <div class="group-name">老年宠物护理</div>
+                        <div class="group-desc">关爱老年宠物，分享护理经验</div>
+                    </div>
+                    <button class="join-btn">加入</button>
+                </div>
+                
+                <div class="group-card" onclick="joinGroup('emergency')">
+                    <div class="group-icon">🚨</div>
+                    <div class="group-info">
+                        <div class="group-name">紧急求助群</div>
+                        <div class="group-desc">24小时在线，宠物紧急情况互助</div>
+                    </div>
+                    <button class="join-btn">加入</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 发帖弹窗 -->
+    <div id="postModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">发布帖子</h3>
+                <span class="close-btn" onclick="hidePostModal()">×</span>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">标题</label>
+                <input type="text" class="form-input" id="postTitle" placeholder="一句话说明你的分享或问题">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">内容</label>
+                <textarea class="form-textarea" id="postContent" placeholder="详细描述你的经验或问题..."></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">选择分类</label>
+                <div class="category-select">
+                    <div class="category-option" data-value="dog">🐕 狗狗</div>
+                    <div class="category-option" data-value="cat">🐱 猫猫</div>
+                    <div class="category-option" data-value="health">💊 健康</div>
+                    <div class="category-option" data-value="food">🍖 饮食</div>
+                    <div class="category-option" data-value="behavior">🎾 行为</div>
+                    <div class="category-option" data-value="save">💰 省钱</div>
+                </div>
+            </div>
+            
+            <button class="submit-btn" onclick="submitPost()">发布</button>
+        </div>
+    </div>
+    
+    <script>
+        // 模拟用户数据
+        let currentUser = {
+            name: '宠友',
+            avatar: '宠',
+            isLoggedIn: false
+        };
+        
+        // 模拟帖子数据
+        let posts = [];
+        
+        // 显示发帖弹窗
+        function showPostModal() {
+            if (!currentUser.isLoggedIn) {
+                if (confirm('需要先登录才能发帖，是否使用微信登录？')) {
+                    simulateWechatLogin();
+                }
+                return;
+            }
+            document.getElementById('postModal').classList.add('active');
+        }
+        
+        // 隐藏发帖弹窗
+        function hidePostModal() {
+            document.getElementById('postModal').classList.remove('active');
+            document.getElementById('postTitle').value = '';
+            document.getElementById('postContent').value = '';
+            document.querySelectorAll('.category-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+        }
+        
+        // 模拟微信登录
+        function simulateWechatLogin() {
+            currentUser = {
+                name: '新用户' + Math.floor(Math.random() * 1000),
+                avatar: '新',
+                isLoggedIn: true
+            };
+            alert('登录成功！');
+            showPostModal();
+        }
+        
+        // 分类选择
+        document.querySelectorAll('.category-option').forEach(option => {
+            option.addEventListener('click', function() {
+                document.querySelectorAll('.category-option').forEach(opt => {
+                    opt.classList.remove('selected');
+                });
+                this.classList.add('selected');
+            });
+        });
+        
+        // 分类标签切换
+        document.querySelectorAll('.category-tabs .tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.category-tabs .tab').forEach(t => {
+                    t.classList.remove('active');
+                });
+                this.classList.add('active');
+                filterPosts(this.dataset.category);
+            });
+        });
+        
+        // 筛选帖子
+        function filterPosts(category) {
+            console.log('筛选分类：', category);
+        }
+        
+        // 提交帖子
+        function submitPost() {
+            const title = document.getElementById('postTitle').value;
+            const content = document.getElementById('postContent').value;
+            const selectedCategory = document.querySelector('.category-option.selected');
+            
+            if (!title || !content) {
+                alert('请填写标题和内容');
+                return;
+            }
+            
+            if (!selectedCategory) {
+                alert('请选择一个分类');
+                return;
+            }
+            
+            const newPost = {
+                id: Date.now(),
+                title: title,
+                content: content,
+                category: selectedCategory.dataset.value,
+                author: currentUser.name,
+                avatar: currentUser.avatar,
+                time: '刚刚',
+                likes: 0,
+                comments: 0,
+                tags: generateTags(selectedCategory.dataset.value)
+            };
+            
+            addPostToList(newPost);
+            hidePostModal();
+            alert('发布成功！');
+        }
+        
+        // 生成标签
+        function generateTags(category) {
+            const tagMap = {
+                dog: ['#狗狗日常', '#铲屎官'],
+                cat: ['#猫猫日常', '#猫奴'],
+                health: ['#健康咨询', '#医疗建议'],
+                food: ['#饮食推荐', '#营养搭配'],
+                behavior: ['#行为训练', '#习惯培养'],
+                save: ['#省钱妙招', '#性价比']
+            };
+            return tagMap[category] || ['#宠物'];
+        }
+        
+        // 添加帖子到列表
+        function addPostToList(post) {
+            const postHTML = `
+                <div class="post-card">
+                    <div class="post-header">
+                        <div class="avatar">${post.avatar}</div>
+                        <div class="post-info">
+                            <div class="username">${post.author}</div>
+                            <div class="post-time">${post.time}</div>
+                        </div>
+                    </div>
+                    <div class="post-content">
+                        <div class="post-title">${post.title}</div>
+                        <div class="post-text">${post.content}</div>
+                        <div class="post-tags">
+                            ${post.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                        </div>
+                    </div>
+                    <div class="post-actions">
+                        <span class="action-btn">❤️ ${post.likes}</span>
+                        <span class="action-btn">💬 ${post.comments}</span>
+                        <span class="action-btn">📤 分享</span>
+                        <span class="action-btn">⭐ 收藏</span>
+                    </div>
+                </div>
+            `;
+            
+            const postList = document.getElementById('postList');
+            const postEntry = document.querySelector('.post-entry');
+            postList.insertAdjacentHTML('afterbegin', postHTML);
+        }
+        
+        // 处理点赞等交互
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('action-btn') && e.target.textContent.includes('❤️')) {
+                e.target.classList.toggle('liked');
+                let likesText = e.target.textContent;
+                let likesCount = parseInt(likesText.match(/\d+/) || 0);
+                if (e.target.classList.contains('liked')) {
+                    likesCount++;
+                } else {
+                    likesCount--;
+                }
+                e.target.textContent = `❤️ ${likesCount}`;
+            }
+            
+            if (e.target.classList.contains('action-btn') && e.target.textContent.includes('📤')) {
+                if (navigator.share) {
+                    navigator.share({
+                        title: '宠友圈 - 养宠经验分享',
+                        text: '我在宠友圈发现了很多实用的养宠经验，快来看看！',
+                        url: window.location.href
+                    });
+                } else {
+                    alert('点击右上角分享给朋友吧！');
+                }
+            }
+            
+            if (e.target.classList.contains('action-btn') && e.target.textContent.includes('⭐')) {
+                e.target.classList.toggle('liked');
+                if (e.target.classList.contains('liked')) {
+                    e.target.textContent = '⭐ 已收藏';
+                } else {
+                    e.target.textContent = '⭐ 收藏';
+                }
+            }
+        });
+        
+        // 底部导航切换
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.nav-item').forEach(nav => {
+                    nav.classList.remove('active');
+                });
+                this.classList.add('active');
+                const navText = this.querySelector('.nav-text').textContent;
+                handleNavigation(navText);
+            });
+        });
+        
+        // 处理导航
+        function handleNavigation(page) {
+            const content = document.querySelector('.content');
+            
+            switch(page) {
+                case '热门':
+                    loadHotPosts();
+                    break;
+                case '群聊':
+                    openChatGroups();
+                    break;
+                case '问答':
+                    loadQAPosts();
+                    break;
+                case '我的':
+                    loadUserProfile();
+                    break;
+                default:
+                    location.reload();
+            }
+        }
+        
+        // 打开群聊列表
+        function openChatGroups() {
+            if (!currentUser.isLoggedIn) {
+                if (confirm('需要先登录才能加入群聊，是否使用微信登录？')) {
+                    simulateWechatLogin();
+                }
+                return;
+            }
+            document.getElementById('groupListModal').classList.add('active');
+        }
+        
+        // 隐藏群组列表
+        function hideGroupListModal() {
+            document.getElementById('groupListModal').classList.remove('active');
+        }
+        
+        // 加入群组并打开聊天
+        function joinGroup(groupId) {
+            hideGroupListModal();
+            openChat(groupId);
+        }
+        
+        // 打开聊天界面
+        function openChat(groupId) {
+            const chatContainer = document.getElementById('chatContainer');
+            chatContainer.classList.add('active');
+            
+            const groupNames = {
+                'dog-health': '狗狗健康交流群',
+                'cat-daily': '猫咪日常分享',
+                'save-money': '省钱妙招群',
+                'newbie': '新手村',
+                'senior': '老年宠物护理',
+                'emergency': '紧急求助群'
+            };
+            
+            document.querySelector('.chat-title').textContent = groupNames[groupId] || '群聊';
+            
+            const badgeDot = document.querySelector('.badge-dot');
+            if (badgeDot) badgeDot.remove();
+            
+            setTimeout(() => {
+                const messages = document.getElementById('chatMessages');
+                messages.scrollTop = messages.scrollHeight;
+            }, 100);
+        }
+        
+        // 关闭聊天界面
+        function closeChat() {
+            document.getElementById('chatContainer').classList.remove('active');
+        }
+        
+        // 发送消息
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const messageText = input.value.trim();
+            
+            if (!messageText) return;
+            
+            const messagesContainer = document.getElementById('chatMessages');
+            
+            const messageHTML = `
+                <div class="message own">
+                    <div class="message-avatar">${currentUser.avatar}</div>
+                    <div class="message-content">
+                        <div class="message-bubble">
+                            <div class="message-text">${messageText}</div>
+                        </div>
+                        <div class="message-time">${new Date().toLocaleTimeString('zh-CN', {hour: '2-digit', minute: '2-digit'})}</div>
+                    </div>
+                </div>
+            `;
+            
+            messagesContainer.insertAdjacentHTML('beforeend', messageHTML);
+            input.value = '';
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            
+            setTimeout(() => {
+                simulateReply(messageText);
+            }, 1000 + Math.random() * 2000);
+        }
+        
+        // 模拟其他用户回复
+        function simulateReply(userMessage) {
+            const replies = [
+                { name: '李医生', avatar: '李', text: '这个问题很常见，我来解答一下...', style: 'background: linear-gradient(135deg, #667eea, #764ba2);' },
+                { name: '王阿姨', avatar: '王', text: '我之前也遇到过这个问题！' },
+                { name: '小美', avatar: '美', text: '同问，期待大佬解答 🙏' },
+                { name: '张姐', avatar: '张', text: '我有个土方法，特别管用！', style: 'background: linear-gradient(135deg, #f093fb, #f5576c);' },
+                { name: '老陈', avatar: '陈', text: '建议去医院检查一下比较保险' }
+            ];
+            
+            const reply = replies[Math.floor(Math.random() * replies.length)];
+            const messagesContainer = document.getElementById('chatMessages');
+            
+            const typingHTML = `
+                <div class="message" id="typing-message">
+                    <div class="message-avatar" ${reply.style ? `style="${reply.style}"` : ''}>${reply.avatar}</div>
+                    <div class="message-content">
+                        <div class="typing-indicator">
+                            <div class="typing-dot"></div>
+                            <div class="typing-dot"></div>
+                            <div class="typing-dot"></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            messagesContainer.insertAdjacentHTML('beforeend', typingHTML);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            
+            setTimeout(() => {
+                const typingMessage = document.getElementById('typing-message');
+                if (typingMessage) typingMessage.remove();
+                
+                const replyHTML = `
+                    <div class="message">
+                        <div class="message-avatar" ${reply.style ? `style="${reply.style}"` : ''}>${reply.avatar}</div>
+                        <div class="message-content">
+                            <div class="message-name">${reply.name}</div>
+                            <div class="message-bubble">
+                                <div class="message-text">${reply.text}</div>
+                            </div>
+                            <div class="message-time">${new Date().toLocaleTimeString('zh-CN', {hour: '2-digit', minute: '2-digit'})}</div>
+                        </div>
+                    </div>
+                `;
+                
+                messagesContainer.insertAdjacentHTML('beforeend', replyHTML);
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }, 1000);
+        }
+        
+        // 群组切换
+        document.querySelectorAll('.group-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.group-tab').forEach(t => {
+                    t.classList.remove('active');
+                });
+                this.classList.add('active');
+                
+                const unread = this.querySelector('.unread');
+                if (unread) {
+                    unread.remove();
+                }
+                
+                const groupName = this.textContent.trim().split('(')[0];
+                document.querySelector('.chat-title').textContent = groupName;
+                
+                loadGroupMessages(this.dataset.group);
+            });
+        });
+        
+        // 加载群组消息
+        function loadGroupMessages(groupId) {
+            const messagesContainer = document.getElementById('chatMessages');
+            messagesContainer.innerHTML = `<div class="system-message">欢迎来到${document.querySelector('.chat-title').textContent} 👋</div>`;
+            
+            if (groupId === 'cat-daily') {
+                messagesContainer.innerHTML += `
+                    <div class="message">
+                        <div class="message-avatar">猫</div>
+                        <div class="message-content">
+                            <div class="message-name">猫奴一号</div>
+                            <div class="message-bubble">
+                                <div class="message-text">看看我家主子今天的睡姿 😂</div>
+                            </div>
+                            <div class="message-time">09:15</div>
+                        </div>
+                    </div>
+                `;
+            } else if (groupId === 'save-money') {
+                messagesContainer.innerHTML += `
+                    <div class="message">
+                        <div class="message-avatar">团</div>
+                        <div class="message-content">
+                            <div class="message-name">团长</div>
+                            <div class="message-bubble">
+                                <div class="message-text">某宝狗粮团购开始了！比平时便宜30%！</div>
+                            </div>
+                            <div class="message-time">14:20</div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+        
+        // 监听回车发送消息
+        document.getElementById('chatInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+        
+        // 模拟接收新消息通知
+        setInterval(() => {
+            if (Math.random() > 0.9 && !document.getElementById('chatContainer').classList.contains('active')) {
+                const navItem = document.querySelector('.nav-item:nth-child(3)');
+                if (!navItem.querySelector('.badge-dot')) {
+                    const dot = document.createElement('span');
+                    dot.className = 'badge-dot';
+                    navItem.appendChild(dot);
+                }
+            }
+        }, 10000);
+        
+        // 加载热门帖子
+        function loadHotPosts() {
+            const content = document.querySelector('.content');
+            content.innerHTML = `
+                <div style="padding: 20px; text-align: center;">
+                    <h3 style="margin-bottom: 20px;">🔥 今日热门</h3>
+                    <div class="post-card">
+                        <div class="post-header">
+                            <div class="avatar" style="background: linear-gradient(135deg, #667eea, #764ba2);">李</div>
+                            <div class="post-info">
+                                <div class="username">
+                                    李医生
+                                    <span class="expert-badge">认证兽医</span>
+                                </div>
+                                <div class="post-time">置顶</div>
+                            </div>
+                        </div>
+                        <div class="post-content">
+                            <div class="post-title">【必看】新手养宠避坑指南TOP10</div>
+                            <div class="post-text">总结了10个新手最容易踩的坑，包括疫苗、驱虫、饮食等方面...</div>
+                            <div class="post-tags">
+                                <span class="tag">#新手必看</span>
+                                <span class="tag">#避坑指南</span>
+                            </div>
+                        </div>
+                        <div class="post-actions">
+                            <span class="action-btn liked">❤️ 5.2k</span>
+                            <span class="action-btn">💬 892</span>
+                            <span class="action-btn">📤 分享</span>
+                            <span class="action-btn">⭐ 收藏</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // 加载问答板块
+        function loadQAPosts() {
+            const content = document.querySelector('.content');
+            content.innerHTML = `
+                <div style="padding: 20px;">
+                    <h3 style="margin-bottom: 20px; text-align: center;">💬 问答专区</h3>
+                    <div style="background: #FFF3E0; padding: 12px; border-radius: 8px; margin-bottom: 20px;">
+                        <p style="font-size: 14px; color: #E65100;">
+                            🏆 回答问题可获得积分，积分可用于向专家提问
+                        </p>
+                    </div>
+                    <div class="post-card">
+                        <div class="post-header">
+                            <div class="avatar">急</div>
+                            <div class="post-info">
+                                <div class="username">急急急</div>
+                                <div class="post-time">10分钟前</div>
+                            </div>
+                        </div>
+                        <div class="post-content">
+                            <div class="post-title">狗狗突然不吃东西怎么办？在线等！</div>
+                            <div class="post-text">今天早上开始就不吃东西了，精神还可以...</div>
+                            <div class="post-tags">
+                                <span class="tag" style="background: #FFEBEE; color: #D32F2F;">#紧急</span>
+                            </div>
+                        </div>
+                        <div class="post-actions">
+                            <span class="action-btn">💬 快速回答</span>
+                            <span class="action-btn">👁️ 234</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // 加载用户资料
+        function loadUserProfile() {
+            const content = document.querySelector('.content');
+            
+            if (!currentUser.isLoggedIn) {
+                content.innerHTML = `
+                    <div style="padding: 40px; text-align: center;">
+                        <div style="font-size: 60px; margin-bottom: 20px;">🐾</div>
+                        <h3 style="margin-bottom: 20px;">加入宠友圈</h3>
+                        <p style="color: #666; margin-bottom: 30px;">登录后即可发帖、评论、收藏</p>
+                        <button class="submit-btn" onclick="simulateWechatLogin()" style="width: 200px; margin: 0 auto;">
+                            微信一键登录
+                        </button>
+                    </div>
+                `;
+            } else {
+                content.innerHTML = `
+                    <div style="padding: 20px;">
+                        <div style="background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px; text-align: center;">
+                            <div class="avatar" style="width: 80px; height: 80px; font-size: 32px; margin: 0 auto 15px;">
+                                ${currentUser.avatar}
+                            </div>
+                            <h3>${currentUser.name}</h3>
+                            <p style="color: #666; margin-top: 10px;">新手铲屎官</p>
+                            <div style="display: flex; justify-content: space-around; margin-top: 20px;">
+                                <div>
+                                    <div style="font-size: 20px; font-weight: bold;">0</div>
+                                    <div style="font-size: 12px; color: #666;">发帖</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 20px; font-weight: bold;">0</div>
+                                    <div style="font-size: 12px; color: #666;">收藏</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 20px; font-weight: bold;">10</div>
+                                    <div style="font-size: 12px; color: #666;">积分</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div style="background: white; border-radius: 12px; padding: 15px;">
+                            <div style="padding: 12px 0; border-bottom: 1px solid #f0f0f0;">
+                                <span style="margin-right: 10px;">📝</span> 我的帖子
+                            </div>
+                            <div style="padding: 12px 0; border-bottom: 1px solid #f0f0f0;">
+                                <span style="margin-right: 10px;">⭐</span> 我的收藏
+                            </div>
+                            <div style="padding: 12px 0; border-bottom: 1px solid #f0f0f0;">
+                                <span style="margin-right: 10px;">🏆</span> 积分明细
+                            </div>
+                            <div style="padding: 12px 0;">
+                                <span style="margin-right: 10px;">⚙️</span> 设置
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+        
+        // 模拟下拉刷新
+        let startY = 0;
+        let isPulling = false;
+        
+        document.addEventListener('touchstart', function(e) {
+            if (window.scrollY === 0) {
+                startY = e.touches[0].clientY;
+                isPulling = true;
+            }
+        });
+        
+        document.addEventListener('touchmove', function(e) {
+            if (!isPulling) return;
+            
+            const currentY = e.touches[0].clientY;
+            const pullDistance = currentY - startY;
+            
+            if (pullDistance > 100) {
+                document.body.style.transform = `translateY(${Math.min(pullDistance * 0.5, 80)}px)`;
+            }
+        });
+        
+        document.addEventListener('touchend', function(e) {
+            if (!isPulling) return;
+            
+            document.body.style.transition = 'transform 0.3s';
+            document.body.style.transform = 'translateY(0)';
+            
+            setTimeout(() => {
+                document.body.style.transition = '';
+            }, 300);
+            
+            isPulling = false;
+        });
+        
+        // 模拟无限滚动加载
+        window.addEventListener('scroll', function() {
+            if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 100) {
+                console.log('加载更多...');
+            }
+        });
+    </script>
+
+<!-- MVP localStorage + 分类筛选 补丁（不改原结构，可随时删除） -->
+<script>
+(function() {
+  const STORAGE_KEY = 'mvp_posts';
+  let persisted = [];
+
+  function readStorage() {
+    try { persisted = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); }
+    catch (e) { persisted = []; }
+  }
+  function writeStorage() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(persisted)); } catch(e){}
+  }
+
+  // 保存一份原函数
+  const originalAddPostToList = window.addPostToList;
+
+  // 包装 addPostToList：渲染 + 保存
+  window.addPostToList = function(post, opts) {
+    // 尽量补齐分类字段
+    try {
+      if (!post.category) {
+        const sel = document.querySelector('.category-option.selected');
+        const val = sel?.dataset?.value || sel?.textContent || '其他';
+        post.category = (val || '').trim();
+      }
+    } catch(e){}
+    if (typeof originalAddPostToList === 'function') {
+      originalAddPostToList(post);
+    }
+    // 跳过保存（例如从本地恢复时）
+    if (opts && opts.skipSave) return;
+    try {
+      persisted.push(post);
+      writeStorage();
+    } catch(e){}
+  };
+
+  // 重写 filterPosts：按分类重渲染
+  window.filterPosts = function(category) {
+    try {
+      const list = document.getElementById('postList');
+      if (!list) return;
+      list.innerHTML = '';
+      const selected = (!category || category === 'all') ? persisted : persisted.filter(p => (p.category||'').trim() === category);
+      selected.forEach(p => {
+        if (typeof originalAddPostToList === 'function') {
+          originalAddPostToList(p);
+        }
+      });
+    } catch(e){ console.warn('filterPosts error', e); }
+  };
+
+  // 页面加载：读取并恢复帖子
+  document.addEventListener('DOMContentLoaded', function() {
+    readStorage();
+    if (persisted.length) {
+      const list = document.getElementById('postList');
+      if (list) list.innerHTML = '';
+      persisted.forEach(p => {
+        if (typeof originalAddPostToList === 'function') {
+          originalAddPostToList(p);
+        }
+      });
+    }
+  });
+
+  // 清空本地数据的小工具（可选）
+  window.__clearLocalPosts = function() {
+    localStorage.removeItem(STORAGE_KEY);
+    alert('已清空本地帖子，下次刷新后恢复为空');
+  };
+})();
+</script>
+
+</body>
+</html>
